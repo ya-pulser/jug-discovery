@@ -23,7 +23,7 @@ object Publisher {
         log.info("Stopping " + this)
       }
 
-      protected def receive: TestActor#Receive = {
+      def receive = {
         case msg => log.info(msg.toString + " from " + sender)
       }
     }
