@@ -1,7 +1,7 @@
 package jug.discovery.akka
 
 import akka.actor.{ActorSystem, ActorRef}
-import jug.discovery.{ActorSystemed, UnpackLink}
+import jug.discovery.UnpackLink
 
 /**
  */
