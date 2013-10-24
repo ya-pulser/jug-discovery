@@ -1,7 +1,6 @@
 package jug.discovery.curator
 
 import com.netflix.curator.framework.CuratorFramework
-import com.netflix.curator.utils.EnsurePath
 import com.netflix.curator.x.discovery.ServiceDiscoveryBuilder
 import jug.discovery.Logging
 
@@ -9,7 +8,7 @@ import jug.discovery.Logging
   */
 class MyDiscovery private(curator: CuratorFramework, prefix: String) extends Logging {
 
-  new EnsurePath(prefix).ensure(curator.getZookeeperClient)
+  //new EnsurePath(prefix).ensure(curator.getZookeeperClient)
 
   val discovery = ServiceDiscoveryBuilder
     .builder(classOf[String])

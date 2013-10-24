@@ -2,14 +2,14 @@ package jug.discovery.curator
 
 import com.netflix.curator.framework.CuratorFramework
 import com.netflix.curator.framework.state.{ConnectionState, ConnectionStateListener}
-import com.netflix.curator.x.discovery.ServiceInstance
+import com.netflix.curator.x.discovery.{ServiceDiscovery, ServiceInstance}
 import java.util.concurrent.atomic.AtomicReference
 import jug.discovery.{Logging, PackLink, Publisher}
 
 /**
   */
 class ZooKeeperPublisher[K](curator: CuratorFramework,
-                            discovery: MyDiscovery,
+                            discovery: ServiceDiscovery[String],
                             packer: PackLink[K]) extends Publisher[K] with Logging {
 
   private val listener = new ConnectionStateListener() {
@@ -27,24 +27,24 @@ class ZooKeeperPublisher[K](curator: CuratorFramework,
 
   def close() {
     curator.getConnectionStateListenable.removeListener(listener)
-    registered.getAndSet(List.empty).foreach(discovery.discovery.unregisterService)
+    registered.getAndSet(List.empty).foreach(discovery.unregisterService)
   }
 
   override def publish(item: K, name: String) = {
     val service = toServiceDescription(item, name)
     log.info("publishing service " + service)
-    discovery.discovery.registerService(service)
+    discovery.registerService(service)
     this.synchronized(registered.set(registered.get :+ service))
   }
 
   override def unpublish(item: K, name: String) = {
     val service = toServiceDescription(item, name)
     log.info("un-publishing service " + service)
-    discovery.discovery.unregisterService(service)
+    discovery.unregisterService(service)
     this.synchronized(registered.set(registered.get.filter(_.equals(service))))
   }
 
-  private def reregister() = registered.get.foreach(discovery.discovery.registerService)
+  private def reregister() = registered.get.foreach(discovery.registerService)
 
   private def toServiceDescription(item: K, topic: String): ServiceInstance[String] = {
     val service: ServiceInstance[String] = ServiceInstance.builder[String]()

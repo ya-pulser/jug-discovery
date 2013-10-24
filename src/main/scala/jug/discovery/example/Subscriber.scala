@@ -4,23 +4,27 @@ import akka.actor.{Props, ActorRef, ActorSystem}
 import com.typesafe.config.ConfigFactory
 import jug.discovery.Logging
 import jug.discovery.akka.{AnyClusteredActor, UriResolverToActorRef}
-import jug.discovery.curator.{ConfigForCurated, CuratedSubscriber}
+import jug.discovery.curator.{MyCurator, MyDiscovery, CuratedSubscriber}
 
 /**
- */
-object Subscriber extends Logging{
+  */
+object Subscriber extends Logging {
 
   def main(args: Array[String]) {
 
-    val config = ConfigFactory.parseString("" +
-      "akka.actor.provider = \"akka.remote.RemoteActorRefProvider\" \n" +
-      "akka.remote.netty.port=0"
+    val config = ConfigFactory.parseString(
+      """
+        |akka.actor.provider = "akka.remote.RemoteActorRefProvider"
+        |akka.remote.netty.port=0
+      """.stripMargin
     )
 
     val as = ActorSystem("XySystem", config)
 
+    val discovery = MyDiscovery(MyCurator("localhost:2181"), "/discovery-root")
+
     val subscriber = new CuratedSubscriber[ActorRef](
-      ConfigForCurated("127.0.0.1:2181", "/discovery-root"),
+      discovery.discovery,
       new UriResolverToActorRef(as))
 
     val references = subscriber.subscribe("mega-test-actor")
