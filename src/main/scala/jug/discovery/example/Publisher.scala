@@ -1,15 +1,14 @@
 package jug.discovery.example
 
-import org.slf4j.LoggerFactory
 import akka.actor.{Props, ActorRef, ActorSystem, Actor}
 import com.typesafe.config.ConfigFactory
-import jug.discovery.curator.{CuratedPublisher, MyDiscovery, MyCurator}
+import jug.discovery.Logging
 import jug.discovery.akka.PackLinkToActorRef
+import jug.discovery.curator.{ZooKeeperPublisher, MyDiscovery, MyCurator}
 
 /**
- */
-object Publisher {
-  private val log = LoggerFactory.getLogger(getClass)
+  */
+object Publisher extends Logging {
 
   def main(args: Array[String]) {
 
@@ -37,8 +36,8 @@ object Publisher {
 
     val curator = MyCurator("127.0.0.1:2181")
     val discovery = MyDiscovery(curator, "/discovery-root")
-    val publisher: CuratedPublisher[ActorRef] = new CuratedPublisher[ActorRef](
-      curator, discovery, new PackLinkToActorRef(as))
+    val publisher: ZooKeeperPublisher[ActorRef] = new ZooKeeperPublisher[ActorRef](
+      curator.curator, discovery, new PackLinkToActorRef(as))
 
     val actor1 = as.actorOf(Props[TestActor], name = "vasya")
     publisher.publish(actor1, "mega-test-actor")

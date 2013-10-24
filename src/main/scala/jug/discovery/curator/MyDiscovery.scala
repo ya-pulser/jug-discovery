@@ -1,19 +1,20 @@
 package jug.discovery.curator
 
-import org.slf4j.LoggerFactory
+import com.netflix.curator.framework.CuratorFramework
 import com.netflix.curator.utils.EnsurePath
 import com.netflix.curator.x.discovery.ServiceDiscoveryBuilder
+import jug.discovery.Logging
 
 /**
- */
-class MyDiscovery private(curator: MyCurator, prefix: String) {
-  private val log = LoggerFactory.getLogger(getClass)
+  */
+class MyDiscovery private(curator: CuratorFramework, prefix: String) extends Logging {
 
-  new EnsurePath(prefix).ensure(curator.curator.getZookeeperClient)
+  new EnsurePath(prefix).ensure(curator.getZookeeperClient)
+
   val discovery = ServiceDiscoveryBuilder
     .builder(classOf[String])
     .basePath(prefix)
-    .client(curator.curator)
+    .client(curator)
     .build()
   discovery.start()
   log.info("Started discovery over " + curator)
@@ -25,8 +26,8 @@ class MyDiscovery private(curator: MyCurator, prefix: String) {
 
 object MyDiscovery {
 
-  def apply(zkUrl: String, prefix: String):MyDiscovery = MyDiscovery(MyCurator(zkUrl), prefix)
+  def apply(zkUrl: String, prefix: String): MyDiscovery = MyDiscovery(MyCurator(zkUrl), prefix)
 
-  def apply(curator: MyCurator, prefix: String):MyDiscovery = new MyDiscovery(curator, prefix)
+  def apply(curator: MyCurator, prefix: String): MyDiscovery = new MyDiscovery(curator.curator, prefix)
 
 }

@@ -1,11 +1,11 @@
 package jug.discovery.curator
 
 import java.util.concurrent.atomic.AtomicReference
-import jug.discovery.{UnpackLink, CachedRemoteReferences, Subscriber}
+import jug.discovery.{UriResolver, CachedRemoteReferences, Subscriber}
 
 /**
  */
-class CuratedSubscriber[K] (config: ConfigForCurated, unpacker:UnpackLink[K]) extends Subscriber[K] {
+class CuratedSubscriber[K] (config: ConfigForCurated, unpacker:UriResolver[K]) extends Subscriber[K] {
 
   val curator = MyCurator(config.zkUrls)
   val discovery = MyDiscovery(curator, config.rootPath)

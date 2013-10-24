@@ -1,15 +1,14 @@
 package jug.discovery.example
 
-import org.slf4j.LoggerFactory
-import com.typesafe.config.ConfigFactory
 import akka.actor.{Props, ActorRef, ActorSystem}
+import com.typesafe.config.ConfigFactory
+import jug.discovery.Logging
+import jug.discovery.akka.{AnyClusteredActor, UriResolverToActorRef}
 import jug.discovery.curator.{ConfigForCurated, CuratedSubscriber}
-import jug.discovery.akka.{AnyClusteredActor, UnpackLinkToActorRef}
 
 /**
  */
-object Subscriber {
-  private val log = LoggerFactory.getLogger(getClass)
+object Subscriber extends Logging{
 
   def main(args: Array[String]) {
 
@@ -22,7 +21,7 @@ object Subscriber {
 
     val subscriber = new CuratedSubscriber[ActorRef](
       ConfigForCurated("127.0.0.1:2181", "/discovery-root"),
-      new UnpackLinkToActorRef(as))
+      new UriResolverToActorRef(as))
 
     val references = subscriber.subscribe("mega-test-actor")
 

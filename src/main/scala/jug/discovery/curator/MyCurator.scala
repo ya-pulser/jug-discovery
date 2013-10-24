@@ -1,13 +1,13 @@
 package jug.discovery.curator
 
-import org.slf4j.LoggerFactory
 import com.netflix.curator.framework.CuratorFrameworkFactory
 import com.netflix.curator.retry.RetryOneTime
+import jug.discovery.Logging
 
 /**
- */
-class MyCurator private(zkUrl: String) {
-  private val log = LoggerFactory.getLogger(getClass)
+  */
+class MyCurator private(zkUrl: String) extends Logging {
+
   val curator = CuratorFrameworkFactory
     .builder()
     .connectionTimeoutMs(1000)
@@ -23,6 +23,6 @@ class MyCurator private(zkUrl: String) {
 }
 
 object MyCurator {
-  def apply(zkUrl: String):MyCurator = new MyCurator(zkUrl)
+  def apply(zkUrl: String): MyCurator = new MyCurator(zkUrl)
 }
 

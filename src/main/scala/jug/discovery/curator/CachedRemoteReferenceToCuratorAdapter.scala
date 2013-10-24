@@ -1,18 +1,18 @@
 package jug.discovery.curator
 
-import com.netflix.curator.x.discovery.ServiceDiscovery
-import com.netflix.curator.x.discovery.details.ServiceCacheListener
-import org.slf4j.LoggerFactory
 import com.netflix.curator.framework.CuratorFramework
 import com.netflix.curator.framework.state.ConnectionState
+import com.netflix.curator.x.discovery.ServiceDiscovery
+import com.netflix.curator.x.discovery.details.ServiceCacheListener
+import jug.discovery.{Logging, RemoteReference, CachedRemoteReferences}
 import scala.collection.JavaConversions._
 
-import jug.discovery.{RemoteReference, CachedRemoteReferences}
 
 /**
- */
-class CachedRemoteReferenceToCuratorAdapter[K](topic: String, discovery: ServiceDiscovery[String], val refs: CachedRemoteReferences[K]) {
-  private val log = LoggerFactory.getLogger(this.getClass)
+  */
+class CachedRemoteReferenceToCuratorAdapter[K](topic: String,
+                                               discovery: ServiceDiscovery[String],
+                                               val refs: CachedRemoteReferences[K]) extends Logging {
 
   val listen = new ServiceCacheListener() {
     override def stateChanged(p1: CuratorFramework, p2: ConnectionState) {}
