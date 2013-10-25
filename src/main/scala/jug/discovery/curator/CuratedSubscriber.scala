@@ -2,11 +2,11 @@ package jug.discovery.curator
 
 import com.netflix.curator.x.discovery.ServiceDiscovery
 import java.util.concurrent.atomic.AtomicReference
-import jug.discovery.{UriResolver, CachedRemoteReferences, Subscriber}
+import jug.discovery.{ReferenceUnpacker, CachedRemoteReferences, Subscriber}
 
 /**
   */
-class CuratedSubscriber[K](discovery: ServiceDiscovery[String], unpacker: UriResolver[K]) extends Subscriber[K] {
+class CuratedSubscriber[K](discovery: ServiceDiscovery[String], unpacker: ReferenceUnpacker[K]) extends Subscriber[K] {
 
   private val handle = new AtomicReference[Map[String, CachedRemoteReferenceToCuratorAdapter[K]]](Map.empty)
 

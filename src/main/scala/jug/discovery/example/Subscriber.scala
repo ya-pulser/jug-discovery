@@ -3,7 +3,7 @@ package jug.discovery.example
 import akka.actor.{Props, ActorRef, ActorSystem}
 import com.typesafe.config.ConfigFactory
 import jug.discovery.Logging
-import jug.discovery.akka.{AnyClusteredActor, UriResolverToActorRef}
+import jug.discovery.akka.{AnyClusteredActor, ReferenceUnpackerToActorRef}
 import jug.discovery.curator.{MyCurator, MyDiscovery, CuratedSubscriber}
 
 /**
@@ -25,7 +25,7 @@ object Subscriber extends Logging {
 
     val subscriber = new CuratedSubscriber[ActorRef](
       discovery.discovery,
-      new UriResolverToActorRef(as))
+      new ReferenceUnpackerToActorRef(as))
 
     val references = subscriber.subscribe("mega-test-actor")
 

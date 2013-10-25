@@ -1,34 +1,15 @@
 package jug.discovery.curator
 
-import com.netflix.curator.framework.CuratorFramework
-import com.netflix.curator.framework.state.{ConnectionState, ConnectionStateListener}
 import com.netflix.curator.x.discovery.{ServiceDiscovery, ServiceInstance}
 import java.util.concurrent.atomic.AtomicReference
-import jug.discovery.{Logging, PackLink, Publisher}
+import jug.discovery.{Logging, ReferencePacker, Publisher}
 
 /**
   */
-class ZooKeeperPublisher[K](curator: CuratorFramework,
-                            discovery: ServiceDiscovery[String],
-                            packer: PackLink[K]) extends Publisher[K] with Logging {
-
-  private val listener = new ConnectionStateListener() {
-    def stateChanged(client: CuratorFramework, newState: ConnectionState) = {
-      if (newState == ConnectionState.RECONNECTED) {
-        log.info("reregistering services on restored connection to zookeeper")
-        reregister()
-      }
-    }
-  }
+class ZooKeeperPublisher[K](discovery: ServiceDiscovery[String],
+                            packer: ReferencePacker[K]) extends Publisher[K] with Logging {
 
   private val registered = new AtomicReference(List.empty[ServiceInstance[String]])
-
-  curator.getConnectionStateListenable.addListener(listener)
-
-  def close() {
-    curator.getConnectionStateListenable.removeListener(listener)
-    registered.getAndSet(List.empty).foreach(discovery.unregisterService)
-  }
 
   override def publish(item: K, name: String) = {
     val service = toServiceDescription(item, name)
@@ -44,13 +25,15 @@ class ZooKeeperPublisher[K](curator: CuratorFramework,
     this.synchronized(registered.set(registered.get.filter(_.equals(service))))
   }
 
-  private def reregister() = registered.get.foreach(discovery.registerService)
+  def close() {
+    registered.getAndSet(List.empty).foreach(discovery.unregisterService)
+  }
 
   private def toServiceDescription(item: K, topic: String): ServiceInstance[String] = {
     val service: ServiceInstance[String] = ServiceInstance.builder[String]()
       .name(topic)
-      .id(packer.uniqId(item, topic))
-      .payload(packer.packLink(item))
+      .id(packer.uniqueId(item, topic))
+      .payload(packer.pack(item))
       .build()
     service
   }

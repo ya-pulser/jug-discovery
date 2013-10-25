@@ -2,18 +2,18 @@ package jug.discovery.akka
 
 import akka.actor._
 import akka.remote.RemoteActorRefProvider
-import jug.discovery.PackLink
+import jug.discovery.ReferencePacker
 
 /**
  */
-class PackLinkToActorRef(val actorSystem: ActorSystem) extends PackLink[ActorRef] {
+class ReferencePackerToActorRef(val actorSystem: ActorSystem) extends ReferencePacker[ActorRef] {
 
   // http://stackoverflow.com/a/14289707/707608
   private def buildId(defaultAddress: Address, name: String) = defaultAddress.hostPort + "=" + name
 
   private def defAddr(actorSystem: ActorSystem) = MyExtension(actorSystem).address
 
-  override def packLink(actor: ActorRef) = {
+  override def pack(actor: ActorRef) = {
     //    val defaultAddress: Address = system.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress
     //    val defaultAddress: Address = system.asInstanceOf[ExtendedActorSystem].provider.rootPath.address
     val defaultAddress: Address = defAddr(actorSystem)
@@ -21,7 +21,7 @@ class PackLinkToActorRef(val actorSystem: ActorSystem) extends PackLink[ActorRef
     actorFullPath
   }
 
-  override def uniqId(t: ActorRef, name: String): String = {
+  override def uniqueId(t: ActorRef, name: String): String = {
     val defaultAddress: Address = defAddr(actorSystem)
 //    buildId(defaultAddress, name + "." + t)
     buildId(defaultAddress, name)

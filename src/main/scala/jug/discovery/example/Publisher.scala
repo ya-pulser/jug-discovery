@@ -3,7 +3,7 @@ package jug.discovery.example
 import akka.actor.{Props, ActorRef, ActorSystem, Actor}
 import com.typesafe.config.ConfigFactory
 import jug.discovery.Logging
-import jug.discovery.akka.PackLinkToActorRef
+import jug.discovery.akka.ReferencePackerToActorRef
 import jug.discovery.curator.{ZooKeeperPublisher, MyDiscovery, MyCurator}
 
 /**
@@ -39,12 +39,12 @@ object Publisher extends Logging {
 
     val as = ActorSystem("MySystem", config)
 
-    val publisher = new ZooKeeperPublisher[ActorRef](curator.curator, discovery, new PackLinkToActorRef(as))
+    val publisher = new ZooKeeperPublisher[ActorRef](curator.curator, discovery, new ReferencePackerToActorRef(as))
 
     val actor1 = as.actorOf(Props[TestActor], name = "vasya")
     publisher.publish(actor1, "mega-test-actor")
 
-    log.info("Ready to serve ... " + new PackLinkToActorRef(as).packLink(actor1))
+    log.info("Ready to serve ... " + new ReferencePackerToActorRef(as).pack(actor1))
 
   }
 

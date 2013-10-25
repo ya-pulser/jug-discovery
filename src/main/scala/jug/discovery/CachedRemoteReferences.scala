@@ -5,7 +5,7 @@ import scala.util.Random
 
 /**
   */
-class CachedRemoteReferences[T](unpacker: UriResolver[T]) extends Logging {
+class CachedRemoteReferences[T](unpacker: ReferenceUnpacker[T]) extends Logging {
 
   val handle = new AtomicReference[Map[String, T]](Map.empty)
 
@@ -17,7 +17,7 @@ class CachedRemoteReferences[T](unpacker: UriResolver[T]) extends Logging {
         published.get(item.id) match {
           case Some(x) => x
           case None =>
-            val a = unpacker.resolve(item.ref)
+            val a = unpacker.unpack(item.ref)
             a.get
         })
     }).toMap
